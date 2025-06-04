@@ -41,3 +41,8 @@ table {
   border-radius: 10px;
   overflow: hidden;
 }
+
+
+.nuka-container img{ 
+  width: 100%;
+}
