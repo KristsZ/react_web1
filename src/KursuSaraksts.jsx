@@ -78,7 +78,7 @@ function KursuSaraksts() {
         <div className="cards" >
           {kartinas.map((item, i) => {
             return (
-              <Kartiņa nosaukums={item.nosaukums} apraksts={item.apraksts} attēls={item.attēls} fons={item.fons} />)
+              <Kartiņa nosaukums={item.nosaukums} apraksts={item.apraksts} attēls={item.attēls} fons={item.fons} key={i}/>)
           })}
         </div>
         {/* Cards ends */}
