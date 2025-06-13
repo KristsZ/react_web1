@@ -25,7 +25,7 @@ function Posts() {
     }
 
     const createPost = () => {
-        setEditFormData([]);  // jauns posts, tātad tukši dati
+        setEditFormData([]);
         setFormID(null);
         setVisiblePostDiv(true);
     }
