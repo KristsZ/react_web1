@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function PostForm(props) {
   const [formData, setFormData] = useState({
@@ -6,40 +6,71 @@ export default function PostForm(props) {
     post_content: ''
   });
 
- 
+  useEffect(() => {
+  if (props.formasDati) {
+    // Ja formasDati ir masīvs (piem. [{...}]), ņem pirmo elementu
+    const data = Array.isArray(props.formasDati) ? props.formasDati[0] : props.formasDati;
+
+    if (data && (data.post_title !== undefined || data.post_content !== undefined)) {
+      setFormData({
+        post_title: data.post_title || '',
+        post_content: data.post_content || ''
+      });
+    } else {
+      // Ja jauns posts vai nav datu
+      setFormData({
+        post_title: '',
+        post_content: ''
+      });
+    }
+  }
+}, [props.formasDati]);
+
+
   const handleChange = (e) => {
-    setFormData({ 
-      ...formData, 
-      [e.target.name]: e.target.value 
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
     });
   };
 
-  const savePosts = async ()=>{
-    console.log("Nosūtītais formData:", formData);
-    console.log('Sūtītais formData:', JSON.stringify(formData));
+  const savePosts = async () => {
+    let postFormData = new FormData();
+    postFormData.append('post_title', formData.post_title);
+    postFormData.append('post_content', formData.post_content);
 
-     let postFormData = new FormData();
+    let url = '';
+    let method = '';
 
-  postFormData.append('post_title',formData.post_title)
-  postFormData.append('post_content',formData.post_content);
+    if (props.editFormId) {
+      url = `http://localhost:8080/posts/${props.editFormId}/update`;
+      method = 'POST';
+    } else {
+      url = 'http://localhost:8080/posts/create';
+      method = 'POST';
+    }
 
-    
-
-     let response = await fetch('http://localhost:8080/posts/create',{
-        method: 'POST',
+    try {
+      let response = await fetch(url, {
+        method: method,
         body: postFormData
       });
 
-      let data = await response.json();
-        props.closeModal();
-        props.reload();
+      if (!response.ok) {
+        throw new Error(`Server returned ${response.status}`);
+      }
+
+      await response.json();
+      props.closeModal();
+      props.reload();
+    } catch (err) {
+      console.error("Saglabāšana neizdevās:", err);
+      alert("Kļūda saglabājot ziņu.");
+    }
   };
-  
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData); // Šeit var pievienot savu apstrādes loģiku
-
     savePosts();
   };
 
@@ -79,7 +110,7 @@ export default function PostForm(props) {
         type="submit"
         className="w-full py-3 px-6 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition duration-300"
       >
-        Publicēt
+        {props.editFormId ? 'Saglabāt izmaiņas' : 'Publicēt'}
       </button>
     </form>
   );
