@@ -7,25 +7,24 @@ export default function PostForm(props) {
   });
 
   useEffect(() => {
-  if (props.formasDati) {
-    // Ja formasDati ir masīvs (piem. [{...}]), ņem pirmo elementu
-    const data = Array.isArray(props.formasDati) ? props.formasDati[0] : props.formasDati;
+    if (props.formasDati) {
+      // Ja formasDati ir masīvs (piem. [{...}]), ņem pirmo elementu
+      const data = Array.isArray(props.formasDati) ? props.formasDati[0] : props.formasDati;
 
-    if (data && (data.post_title !== undefined || data.post_content !== undefined)) {
-      setFormData({
-        post_title: data.post_title || '',
-        post_content: data.post_content || ''
-      });
-    } else {
-      // Ja jauns posts vai nav datu
-      setFormData({
-        post_title: '',
-        post_content: ''
-      });
+      if (data && (data.post_title !== undefined || data.post_content !== undefined)) {
+        setFormData({
+          post_title: data.post_title || '',
+          post_content: data.post_content || ''
+        });
+      } else {
+        // Ja jauns posts vai nav datu
+        setFormData({
+          post_title: '',
+          post_content: ''
+        });
+      }
     }
-  }
-}, [props.formasDati]);
-
+  }, [props.formasDati]);
 
   const handleChange = (e) => {
     setFormData({
@@ -40,19 +39,21 @@ export default function PostForm(props) {
     postFormData.append('post_content', formData.post_content);
 
     let url = '';
-    let method = '';
+    let method = 'POST';
 
     if (props.editFormId) {
-      url = `http://localhost:8080/posts/${props.editFormId}/update`;
-      method = 'POST';
+      // Labots URL atbilstoši CodeIgniter maršrutiem
+      url = `http://localhost:8080/posts/update/${props.editFormId}`;
     } else {
       url = 'http://localhost:8080/posts/create';
-      method = 'POST';
     }
 
     try {
       let response = await fetch(url, {
         method: method,
+        headers: {
+          'Accept': 'application/json',
+        },
         body: postFormData
       });
 

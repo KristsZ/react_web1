@@ -57,6 +57,26 @@ function Posts() {
         }
     }
 
+   const deletePost = async (id) => {
+    if (!window.confirm("Vai tiešām vēlaties dzēst šo ziņu?")) return;
+
+    try {
+        let response = await fetch(`http://localhost:8080/posts/delete/${id}`, {
+            method: 'DELETE'
+        });
+
+        if (!response.ok) {
+            throw new Error(`Server returned ${response.status}`);
+        }
+
+        alert("Ziņa veiksmīgi izdzēsta.");
+        doReload();
+    } catch (error) {
+        console.error("Neizdevās dzēst ziņu:", error);
+        alert("Kļūda dzēšot ziņu.");
+    }
+};
+
     useEffect(() => {
         loadPosts().then((data) => {
             setPosts(data);
@@ -85,6 +105,7 @@ function Posts() {
                     <tr>
                         <th>Post</th>
                         <th>View post</th>
+                        <th className="border border-slate-300 p-2">Dzēst</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -93,6 +114,14 @@ function Posts() {
                             <td>{post.post_title}</td>
                             <td>
                                 <button data-id={post.id} onClick={openPost}>Skatīt postu</button>
+                            </td>
+                            <td className="border border-slate-300 p-2">
+                                <button
+                                    className="ml-2 text-red-600 hover:text-red-800"
+                                    onClick={() => deletePost(post.id)}
+                                >
+                                    Dzēst
+                                </button>
                             </td>
                         </tr>
                     ))}
